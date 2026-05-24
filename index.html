@@ -20,9 +20,9 @@
 
 <body>
     
-  <audio autoplay loop controls>
+    <audio id="bg-music" loop>
         <source src="song.mp3" type="audio/mpeg">
-  </audio>
+    </audio>
 
     
     
@@ -169,7 +169,10 @@
     let currentIndexLetter = 0;
     let currentIndexTitle = 0;
     let date__of__birth = document.querySelector(".date__of__birth span");
-    let text__letter = document.querySelector(".text__letter p");
+    
+    // Safety check comment: Ensure '.text__letter p' exists in your CSS/HTML or this might throw an error.
+    let text__letter = document.querySelector(".text__letter p"); 
+    
     setTimeout(function () {
         timeDatetxt = setInterval(function () {
             if (currentIndex < charArrDate.length) {
@@ -188,7 +191,13 @@
 
     var intervalContent;
     var intervalTitle;
+    
     $("#btn__letter").on("click", function () {
+        // FIX 2: Trigger audio playback inside the click event so browsers allow it
+        document.getElementById('bg-music').play().catch(function(error) {
+            console.log("Audio play failed/blocked: ", error);
+        });
+
         $(".box__letter").slideDown()
         setTimeout(function () {
             $(".letter__border").slideDown();
@@ -220,7 +229,7 @@
         setTimeout(function () {
             intervalContent = setInterval(function () {
                 if (currentIndexLetter < charArrDateLetter.length) {
-                    text__letter.textContent += charArrDateLetter[currentIndexLetter];
+                    if(text__letter) text__letter.textContent += charArrDateLetter[currentIndexLetter];
                     currentIndexLetter++;
                 }
                 else {
@@ -229,10 +238,14 @@
             }, 50)
         }, 6000)
     })
+    
     $(".close").on("click", function () {
+        // OPTIONAL FIX: Pause the music when they close the letter, or leave it playing!
+        // document.getElementById('bg-music').pause(); 
+
         clearInterval(intervalContent)
         document.querySelector(".title__letter").textContent = "";
-        text__letter.textContent = "";
+        if(text__letter) text__letter.textContent = "";
         currentIndexLetter = 0
         currentIndexTitle = 0
         document.querySelector("#heart__letter").classList.remove("animationOp");
@@ -245,14 +258,16 @@
         $(".letter__border").slideUp();
     })
 
-
-
     let mailBox = document.querySelector('.mail')
     let boxmail = document.querySelector('.boxMail')
     var close = document.querySelector('.fa-xmark')
+    
     mailBox.onclick = function () {
         mailBox.classList.toggle('active')
         boxmail.classList.add('active')
+        
+        // FIX 3: Also triggering audio here just in case this listener fires instead of #btn__letter
+        document.getElementById('bg-music').play().catch(e => console.log(e));
     }
 
     close.addEventListener('click', function () {
